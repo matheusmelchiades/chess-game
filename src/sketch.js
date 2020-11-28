@@ -7,6 +7,7 @@ function setup() {
   board.build();
 
   queen = new Queen();
+  window.queen = queen;
 }
 
 function draw() {

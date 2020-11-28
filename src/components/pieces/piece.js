@@ -28,4 +28,40 @@ class Piece {
       image(this.sprite.data, this.coordinates.x + this.size, this.coordinates.y + this.size, this.size, this.size);
     }
   }
+
+  moveUp() {
+    const { x, y } = this.position.current;
+    const target = y - 1;
+
+    if (target >= 0) {
+      this.position.current = { x, y: target };
+    }
+  }
+
+  moveRight() {
+    const { x, y } = this.position.current;
+    const target = x + 1;
+
+    if (target < 8) {
+      this.position.current = { x: target, y };
+    }
+  }
+
+  moveLeft() {
+    const { x, y } = this.position.current;
+    const target = x - 1;
+
+    if (target >= 0) {
+      this.position.current = { x: target, y };
+    }
+  }
+
+  moveDown() {
+    const { x, y } = this.position.current;
+    const target = y + 1;
+
+    if (target < 8) {
+      this.position.current = { x, y: target };
+    }
+  }
 }

@@ -2,16 +2,21 @@ let board3d;
 let game3d;
 let statusEl;
 
-// Camera state
-let camRotX  = -PI / 4;   // elevation angle (negative = looking down)
-let camRotY  = PI / 8;    // horizontal rotation
-let camDist  = 560;
+// Camera state – initialized inside setup() because p5.js constants (PI, HALF_PI…)
+// are not available at module scope; only inside setup/draw and their callees.
+let camRotX;
+let camRotY;
+let camDist;
 
 let _dragStart = null;
 
 // ─── p5.js lifecycle ──────────────────────────────────────────────────────────
 
 function setup() {
+  camRotX = -PI / 4;   // elevation angle (negative = looking down)
+  camRotY =  PI / 8;   // horizontal rotation
+  camDist = 560;
+
   createCanvas(windowWidth, windowHeight, WEBGL);
 
   statusEl = createDiv('');

@@ -122,7 +122,6 @@ class Board3D {
   }
 
   _drawLabels() {
-    noLights();
     noStroke();
     fill(160, 160, 180);
     textSize(13);
@@ -152,8 +151,6 @@ class Board3D {
       pop();
     }
 
-    // Restore lighting context for pieces
-    ambientLight(80);
   }
 
   // ─── Piece renderer ─────────────────────────────────────────────────────────

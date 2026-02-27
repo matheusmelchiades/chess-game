@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Chess 3D</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #12141c;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+
+    <!-- Piece logic (shared with 2D version) -->
+    <script src="./src/components/pieces/piece.js"></script>
+    <script src="./src/components/pieces/pawn.js"></script>
+    <script src="./src/components/pieces/rook.js"></script>
+    <script src="./src/components/pieces/bishop.js"></script>
+    <script src="./src/components/pieces/knight.js"></script>
+    <script src="./src/components/pieces/queen.js"></script>
+    <script src="./src/components/pieces/king.js"></script>
+
+    <!-- Game logic (shared with 2D version) -->
+    <script src="./src/components/game.js"></script>
+
+    <!-- 3D-specific board and sketch -->
+    <script src="./src/components/board3d.js"></script>
+    <script src="./src/sketch3d.js"></script>
+</head>
+
+<body>
+</body>
+
+</html>

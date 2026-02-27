@@ -1,12 +1,12 @@
-class Queen extends Piece {
+class Rook extends Piece {
   constructor(color, col, row) {
     super(color, col, row);
-    this.loadSprite('queen');
+    this.loadSprite('rook');
   }
 
   getMoves(board) {
     const moves = [];
-    const directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+    const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]];
 
     for (const [dc, dr] of directions) {
       let c = this.col + dc;

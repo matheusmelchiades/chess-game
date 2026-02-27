@@ -46,6 +46,7 @@ function draw() {
   const ez  = ehr * cos(camRotY);
 
   camera(ex, ey, ez, 0, 0, 0, 0, 1, 0);
+  board3d.setCameraState(ex, ey, ez, width, height);
 
   // ── Lighting ─────────────────────────────────────────────────────────────────
   ambientLight(80);

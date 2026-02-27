@@ -4,7 +4,7 @@ class Board3D {
     this.sq = 60;       // square size in 3D units
     this.sqH = 8;       // square slab height
     this.pieces = [];
-    this._screenPos = {}; // "col,row" → { sx, sy } – updated each frame for picking
+    this._camera = null; // set each frame via setCameraState()
   }
 
   // ─── Data interface (same contract as Board) ────────────────────────────────
@@ -17,19 +17,56 @@ class Board3D {
     this.pieces = this.pieces.filter(p => !(p.col === col && p.row === row));
   }
 
-  /** Convert screen click → nearest board square. Uses screen positions cached in the last frame. */
+  /** Called once per frame from sketch3d so picking knows the current camera. */
+  setCameraState(ex, ey, ez, w, h) {
+    this._camera = { ex, ey, ez, w, h };
+  }
+
+  /**
+   * Convert screen click → board square via ray-plane intersection.
+   * Casts a ray from the camera eye through the screen pixel and finds
+   * where it hits the board surface plane (y = 0).
+   */
   getGridPosition(mx, my) {
-    let best = null;
-    let bestDist = Infinity;
-    for (let col = 0; col < this.size; col++) {
-      for (let row = 0; row < this.size; row++) {
-        const pos = this._screenPos[`${col},${row}`];
-        if (!pos) continue;
-        const d = dist(mx, my, pos.sx, pos.sy);
-        if (d < bestDist) { bestDist = d; best = { col, row }; }
-      }
-    }
-    return bestDist < this.sq * 0.9 ? best : null;
+    if (!this._camera) return null;
+    const { ex, ey, ez, w, h } = this._camera;
+
+    // ── Camera basis (view direction from eye toward origin) ──────────────────
+    const len = Math.sqrt(ex * ex + ey * ey + ez * ez);
+    const vdx = -ex / len, vdy = -ey / len, vdz = -ez / len; // forward
+
+    // right = cross(forward, worldUp=(0,1,0)) = (-vdz, 0, vdx)
+    const rLen = Math.sqrt(vdz * vdz + vdx * vdx);
+    const rx = -vdz / rLen, rz = vdx / rLen; // ry = 0
+
+    // camUp = cross(right, forward)
+    const ux = -rz * vdy;
+    const uy = rz * vdx - rx * vdz;
+    const uz = rx * vdy;
+
+    // ── Ray direction through pixel (mx, my) ──────────────────────────────────
+    const tanH   = Math.tan(Math.PI / 6); // half-angle for 60° FOV (PI/3)
+    const aspect = w / h;
+    const ndcX   = (2 * mx / w - 1) * tanH * aspect;
+    const ndcY   = (2 * my / h - 1) * tanH;
+
+    const rdx = vdx + ndcX * rx + ndcY * ux;
+    const rdy = vdy + ndcX * 0  + ndcY * uy; // ry = 0
+    const rdz = vdz + ndcX * rz + ndcY * uz;
+
+    // ── Intersect ray with board plane y = 0 ─────────────────────────────────
+    if (Math.abs(rdy) < 0.0001) return null; // ray parallel to board
+    const t = -ey / rdy;
+    if (t <= 0) return null; // intersection behind camera
+
+    const ix = ex + t * rdx;
+    const iz = ez + t * rdz;
+
+    // ── World pos → grid square ───────────────────────────────────────────────
+    const col = Math.floor(ix / this.sq + this.size / 2);
+    const row = Math.floor(iz / this.sq + this.size / 2);
+    if (col < 0 || col >= this.size || row < 0 || row >= this.size) return null;
+    return { col, row };
   }
 
   // ─── 3D helpers ─────────────────────────────────────────────────────────────
@@ -62,9 +99,6 @@ class Board3D {
     for (let col = 0; col < this.size; col++) {
       for (let row = 0; row < this.size; row++) {
         const { x, z } = this._sq3D(col, row);
-
-        // Cache screen position for picking (must be done inside draw context)
-        this._screenPos[`${col},${row}`] = { sx: screenX(x, 0, z), sy: screenY(x, 0, z) };
 
         const isLight = this._isLight(col, row);
         const isSelected = selectedPiece && selectedPiece.col === col && selectedPiece.row === row;

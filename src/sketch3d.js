@@ -9,6 +9,7 @@ let camRotY;
 let camDist;
 
 let _dragStart = null;
+let _isDragging = false;
 
 // ─── p5.js lifecycle ──────────────────────────────────────────────────────────
 
@@ -65,10 +66,14 @@ function draw() {
 
 function mousePressed() {
   _dragStart = { x: mouseX, y: mouseY, rx: camRotX, ry: camRotY };
+  _isDragging = false;
 }
 
 function mouseDragged() {
   if (!_dragStart) return;
+  const moved = dist(mouseX, mouseY, _dragStart.x, _dragStart.y);
+  if (moved < 5) return;
+  _isDragging = true;
   const dx = (mouseX - _dragStart.x) * 0.009;
   const dy = (mouseY - _dragStart.y) * 0.009;
   camRotY = _dragStart.ry + dx;
@@ -80,12 +85,8 @@ function mouseWheel(event) {
   return false; // prevent page scroll
 }
 
-function mouseClicked() {
-  if (!_dragStart) return;
-
-  // Only treat as a click if mouse barely moved (not a drag)
-  const moved = dist(mouseX, mouseY, _dragStart.x, _dragStart.y);
-  if (moved > 6) return;
+function mouseReleased() {
+  if (_isDragging || !_dragStart) return;
 
   if (game3d.status === 'checkmate' || game3d.status === 'stalemate') {
     _startGame();
